@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# How to reproduce
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Have pages with a shared parent in both Page and App router **and** having a basePath
+For example
 ```
+.
+├── pages
+│   └── parent
+│       └── [parentId]
+│           └── child
+│               ├── [childId]
+│               │   └── grand-child
+│               │       └── [grandChildId].tsx
+│               └── [childId].tsx
+└── src
+    └── app
+        └── parent
+            └── [parentId]
+                └── page.tsx
+```
+Where `parent` is shared in both routers
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Current vs. Expected behavior
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Case A from App Router to Page Router ✅ 
+Navigating from `parent/[parentId]` to `parent/[parentId]/child/[child]` or `parent/[parentId]/child/[child]/grand-child/[grandChildId]`, results in the respective pages being rendered and the url matching the folder structure with the basePath being prepended correctly 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Case B from Page Router to App Router ✅ 
+Navigating from `parent/[parentId]/child/[child]` or `parent/[parentId]/child/[child]/grand-child/[grandChildId]` to `parent/[parentId]`, results the page being rendered and the url matching the folder structure with the basePath being prepended correctly 
 
-## Learn More
+## Case C from Page Router to Page Router ❌ 
+Navigating from `parent/[parentId]/child/[child]` to `parent/[parentId]/child/[child]/grand-child/[grandChildId]` or from `parent/[parentId]/child/[child]/grand-child/[grandChildId]` to `parent/[parentId]/child/[child]`, results in a redirection to a non-existing page where the basePath is duplicated I.E. `/base/base/*`
 
-To learn more about Next.js, take a look at the following resources:
+## Video 
+https://github.com/user-attachments/assets/3b990434-6166-4e5d-8c2f-8d0e284bf9c4
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Environment information
+Operating System:
+  Platform: darwin
+  Arch: arm64
+  Version: Darwin Kernel Version 24.2.0: Fri Dec  6 18:51:28 PST 2024; root:xnu-11215.61.5~2/RELEASE_ARM64_T8112
+  Available memory (MB): 24576
+  Available CPU cores: 8
+Binaries:
+  Node: 18.20.2
+  npm: 9.9.4
+  Yarn: N/A
+  pnpm: N/A
+Relevant Packages:
+  next: 15.1.6 // Latest available version is detected (15.1.6).
+  eslint-config-next: 14.2.23
+  react: 19.0.0
+  react-dom: 19.0.0
+  typescript: 5.7.3
+Next.js Config:
+  output: N/A
